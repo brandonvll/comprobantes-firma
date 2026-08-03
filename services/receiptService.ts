@@ -65,6 +65,7 @@ Modifica la fecha y hora impresas arriba por "${fields.date || '01/24/2026'} ${f
 Modifica la fecha en "Transaction Posts On: ${fields.date || '01/25/2026'}"
 
 Conserva intacto el logotipo "BANK OF AMERICA Client Receipt", la línea negra divisoria, el mensaje "Thank you for banking with us today" y todos los párrafos legales de la izquierda.
+IMPORTANTE: Mantén el bloque de texto impreso a la derecha alineado hacia el centro de la hoja para garantizar un margen derecho amplio y limpio, evitando que los números finales (cuenta y fecha) se recorten o queden pegados al borde.
 No señales los cambios. No dibujes cuadros. No agregues flechas. Debe parecer una fotografía 100% auténtica.`;
   }
 

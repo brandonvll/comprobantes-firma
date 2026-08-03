@@ -164,14 +164,14 @@ export function createMockReceiptDataUrl(baseImageDataUrl: string, fields: Recei
           <text x="40" y="340" font-family="Arial, sans-serif" font-size="9" fill="#64748b">95-14-2005B 07-2024</text>
           
           <!-- Right side transaction printout (dot matrix / thermal printer text) -->
-          <g font-family="'Courier New', monospace" font-size="13" fill="#383838" letter-spacing="0.5">
-            <text x="460" y="170">${date} ${time} Assoc: 771</text>
-            <text x="460" y="188">NC Center: 0050900 Seq#: 067</text>
-            <text x="460" y="206">Trans:Deposit Acct#: *********${account}</text>
-            <text x="460" y="224">Trans Total: ${amount}</text>
+          <g font-family="'Courier New', monospace" font-size="12" font-weight="600" fill="#383838">
+            <text x="410" y="170">${date} ${time} Assoc: 771</text>
+            <text x="410" y="188">NC Center: 0050900 Seq#: 067</text>
+            <text x="410" y="206">Trans:Deposit Acct#: *********${account}</text>
+            <text x="410" y="224">Trans Total: ${amount}</text>
             
-            <text x="460" y="254">Chk Amt: ${amount}</text>
-            <text x="460" y="272">Transaction Posts On: ${date}</text>
+            <text x="410" y="254">Chk Amt: ${amount}</text>
+            <text x="410" y="272">Transaction Posts On: ${date}</text>
           </g>
         </g>
       </svg>
