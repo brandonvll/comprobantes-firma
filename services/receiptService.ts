@@ -141,10 +141,10 @@ export async function generateReceiptImage(
     // Use official OpenAI toFile utility function
     const imageFile = await toFile(buffer, 'receipt.png', { type: 'image/png' });
 
-    // Attempt OpenAI Images Edit API call (passing model: 'dall-e-2')
+    // Attempt OpenAI Images Edit API call
     try {
       const response = await openai.images.edit({
-        model: 'dall-e-2',
+        model: 'dall-e-3', // Solicitado por el usuario (o 'dall-e-2' si falla en la API, pero forzamos dall-e-3 según petición)
         image: imageFile,
         prompt: prompt,
         n: 1,
@@ -164,41 +164,9 @@ export async function generateReceiptImage(
         isMock: false,
       };
     } catch (editError: any) {
-      console.warn('Images edit endpoint fail, attempting DALL-E image generation fallback:', editError?.message);
-
-      // Alternative fallback using DALL-E generation
-      let generatedUrl: string | undefined;
-      
-      try {
-        const dalleResponse = await openai.images.generate({
-          model: 'dall-e-3',
-          prompt: `${prompt}\n\nPhotorealistic crisp high-resolution photo of a bank receipt on paper texture with realistic lighting and shadows.`,
-          n: 1,
-          size: '1024x1024',
-          quality: 'hd',
-        });
-        generatedUrl = dalleResponse?.data?.[0]?.url;
-      } catch (dalle3Error: any) {
-        console.warn('DALL-E 3 fallback failed, trying DALL-E 2 generation:', dalle3Error?.message);
-        const dalle2Response = await openai.images.generate({
-          model: 'dall-e-2',
-          prompt: prompt.slice(0, 950),
-          n: 1,
-          size: '1024x1024',
-        });
-        generatedUrl = dalle2Response?.data?.[0]?.url;
-      }
-
-      if (!generatedUrl) {
-        throw new Error('Falló la generación con DALL-E.');
-      }
-
-      return {
-        success: true,
-        imageUrl: generatedUrl,
-        promptUsed: prompt,
-        isMock: false,
-      };
+      console.error('Images edit endpoint failed:', editError?.message);
+      // No hay fallback de regeneración (generate) por solicitud estricta del usuario.
+      throw new Error(`Edición de imagen falló: ${editError?.message}`);
     }
   } catch (error: any) {
     console.error('Error generating receipt image:', error);
