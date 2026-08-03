@@ -70,6 +70,26 @@ IMPORTANTE: Mantén el bloque de texto impreso a la derecha alineado hacia el ce
 No señales los cambios. No dibujes cuadros. No agregues flechas. Debe parecer una fotografía 100% auténtica.`;
   }
 
+  if (fields.bankType === 'chase') {
+    return `Usa la fotografía del recibo térmico de Chase Bank proporcionada como referencia.
+
+Regenera la fotografía manteniendo exactamente la misma tira de papel térmico vertical de Chase recostada sobre la superficie de madera, la perspectiva, iluminación y tipografía de impresora térmica.
+
+Modifica únicamente estos valores:
+
+1. Número de cuenta:
+Modifica los últimos dígitos finales de la cuenta en "Número de cuenta que termina en: ${fields.account || '2274'}"
+
+2. Monto de la transacción:
+Modifica el monto en "Depósito en cuenta ${formattedAmount}" y en "Pagar en ${formattedAmount}"
+
+3. Fecha y Hora:
+Modifica la fecha y hora al final del comprobante por "${fields.date || '07/25/2026'} ${fields.time || '11:02'}"
+
+Conserva intacto el logo de CHASE (texto y símbolo de octágono), los textos "My Transaction Summary", la información de la sucursal Hunters Point, "Business Date" y "Thank you - Sam".
+No señales los cambios. No dibujes cuadros. No agregues flechas. Debe parecer una fotografía 100% auténtica.`;
+  }
+
   return `Usa la imagen proporcionada como referencia.
 
 Regenera la fotografía manteniendo exactamente el mismo recibo.

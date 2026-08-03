@@ -190,45 +190,98 @@ export function createMockReceiptDataUrl(baseImageDataUrl: string, fields: Recei
   const rawAmount = fields.amount || '$3,000.00';
   const amount = formatCurrencyString(rawAmount);
   const date = fields.date || '07/25/2026';
-  const time = fields.time || '11:02 AM';
+  const time = fields.time || '11:02';
 
   const chaseSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="750" viewBox="0 0 400 750">
-      <rect width="400" height="750" fill="#1e293b"/>
-      
-      <!-- Vertical thermal paper strip -->
-      <g transform="translate(30, 20)">
-        <rect width="340" height="710" fill="#f8fafc" rx="4"/>
-        
-        <!-- Chase Logo -->
-        <text x="170" y="55" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="extrabold" fill="#00529b" text-anchor="middle" letter-spacing="2">CHASE</text>
-        <rect x="235" y="38" width="18" height="18" fill="#00529b"/>
-        
-        <text x="170" y="85" font-family="'Courier New', monospace" font-size="10" fill="#64748b" text-anchor="middle">Deposit cash or checks</text>
-        <text x="170" y="98" font-family="'Courier New', monospace" font-size="10" fill="#64748b" text-anchor="middle">at most Chase ATMs.</text>
-        
-        <text x="170" y="125" font-family="'Courier New', monospace" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">My Transaction Summary</text>
-        <line x1="20" y1="135" x2="320" y2="135" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1"/>
-        
-        <!-- Transaction details -->
-        <text x="25" y="165" font-family="'Courier New', monospace" font-size="12" fill="#1e293b">Transacción #31</text>
-        <text x="25" y="183" font-family="'Courier New', monospace" font-size="12" fill="#475569">Número de cuenta que termina en: ${account}</text>
-        <text x="25" y="201" font-family="'Courier New', monospace" font-size="12" fill="#475569">Depósito en cuenta</text>
-        <text x="315" y="201" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="end">${amount}</text>
-        
-        <line x1="20" y1="230" x2="320" y2="230" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
-        
-        <text x="25" y="260" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#1e293b">Pagar en</text>
-        <text x="315" y="260" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="end">${amount}</text>
-        
-        <line x1="20" y1="290" x2="320" y2="290" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1"/>
-        
-        <!-- Bottom info -->
-        <text x="170" y="340" font-family="'Courier New', monospace" font-size="11" fill="#64748b" text-anchor="middle">JPMorgan Chase Bank, N.A.</text>
-        <text x="170" y="358" font-family="'Courier New', monospace" font-size="11" fill="#64748b" text-anchor="middle">Member FDIC, Equal Housing Lender</text>
-        <text x="170" y="380" font-family="'Courier New', monospace" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">Please keep your receipt</text>
-        
-        <text x="170" y="415" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">${date} ${time}</text>
+    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="920" viewBox="0 0 500 920">
+      <defs>
+        <filter id="receipt-shadow">
+          <feDropShadow dx="3" dy="5" stdDeviation="7" flood-opacity="0.35"/>
+        </filter>
+      </defs>
+
+      <!-- Wood background table surface -->
+      <rect width="500" height="920" fill="#2b231f"/>
+
+      <!-- Vertical thermal paper strip with realistic curl/shadow -->
+      <g transform="translate(60, 25) rotate(-0.3, 190, 430)" filter="url(#receipt-shadow)">
+        <rect width="380" height="870" fill="#fdfdfd" rx="2"/>
+
+        <!-- Top paper subtle jagged edge line -->
+        <path d="M 0 0 Q 95 -4 190 0 T 380 0 L 380 870 L 0 870 Z" fill="#fdfdfd"/>
+
+        <!-- Header Chase Logo (Bold text + Octagon Symbol) -->
+        <g transform="translate(100, 40)">
+          <text x="0" y="24" font-family="'Helvetica Neue', Arial, sans-serif" font-size="28" font-weight="900" fill="#18181b" letter-spacing="2">CHASE</text>
+          <!-- Chase Octagon symbol -->
+          <g transform="translate(132, 2)">
+            <polygon points="0,0 12,0 12,5 5,12 0,12" fill="#18181b"/>
+            <polygon points="16,0 28,0 28,12 23,12 23,5" fill="#18181b"/>
+            <polygon points="28,16 28,28 16,28 16,23 23,23" fill="#18181b"/>
+            <polygon points="12,28 0,28 0,16 5,16 5,23" fill="#18181b"/>
+          </g>
+        </g>
+
+        <!-- Thermal Printed Body Text -->
+        <g font-family="'Courier New', monospace" font-size="12" fill="#262626" letter-spacing="0">
+          <!-- ATM Header subtitle -->
+          <text x="190" y="95" text-anchor="middle">Deposit cash or checks</text>
+          <text x="190" y="110" text-anchor="middle">at most Chase ATMs.</text>
+          <text x="190" y="125" text-anchor="middle">An image of your check can</text>
+          <text x="190" y="140" text-anchor="middle">be printed on your receipt.</text>
+
+          <!-- Section title -->
+          <text x="190" y="172" font-weight="bold" text-anchor="middle">My Transaction Summary</text>
+          <text x="30" y="187">*********************************************</text>
+
+          <!-- Transacción #31 -->
+          <text x="35" y="215">Transacción #31</text>
+          <text x="35" y="233">Número de cuenta que termina en:    5091</text>
+          <text x="35" y="251">Retiro de cuenta</text>
+          <text x="345" y="251" text-anchor="end" font-weight="bold">${amount}</text>
+          <text x="35" y="269">de cheques</text>
+
+          <!-- Dotted Divider -->
+          <text x="30" y="295">.............................................</text>
+
+          <!-- Transacción #32 -->
+          <text x="35" y="323">Transacción #32</text>
+          <text x="35" y="341">Número de cuenta que termina en:    ${account}</text>
+          <text x="35" y="359">Depósito en cuenta</text>
+          <text x="345" y="359" text-anchor="end" font-weight="bold">${amount}</text>
+          <text x="35" y="377">de cheques</text>
+
+          <!-- Pagar en -->
+          <text x="35" y="415" font-weight="bold">Pagar en</text>
+          <text x="345" y="415" text-anchor="end" font-weight="bold">${amount}</text>
+
+          <!-- Revision notice -->
+          <text x="35" y="450">Es posible que una revisión adicional</text>
+          <text x="35" y="468">resulte en una demora en la</text>
+          <text x="35" y="486">disponibilidad de este depósito</text>
+
+          <!-- Dotted Divider -->
+          <text x="30" y="512">.............................................</text>
+
+          <!-- Branch & Support -->
+          <text x="190" y="540" text-anchor="middle">JPMorgan Chase Bank, N.A.</text>
+          <text x="190" y="558" text-anchor="middle">Hunters Point, Branch 000748</text>
+          <text x="190" y="576" text-anchor="middle">1-800-935-9935</text>
+          <text x="190" y="594" text-anchor="middle">Your satisfaction matters. Share your</text>
+          <text x="190" y="612" text-anchor="middle">feedback at: chase.com/sendusfeedback</text>
+
+          <!-- Member info -->
+          <text x="190" y="648" text-anchor="middle">Member FDIC, Equal Housing Lender</text>
+          <text x="190" y="666" font-weight="bold" text-anchor="middle">Please keep your receipt</text>
+          <text x="190" y="688" font-size="14" font-weight="bold" text-anchor="middle">${date} ${time}</text>
+
+          <!-- Business Date & Teller notes -->
+          <text x="35" y="730">Business Date 07/27/2026</text>
+          <text x="35" y="748">Session #14</text>
+
+          <text x="35" y="790">Thank you - Sam</text>
+          <text x="35" y="808">Cashbox #10</text>
+        </g>
       </g>
     </svg>
   `;
