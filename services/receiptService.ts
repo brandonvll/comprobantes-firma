@@ -144,7 +144,7 @@ export async function generateReceiptImage(
     // Attempt OpenAI Images Edit API call
     try {
       const response = await openai.images.edit({
-        model: 'dall-e-3', // Solicitado por el usuario (o 'dall-e-2' si falla en la API, pero forzamos dall-e-3 según petición)
+        model: 'dall-e-2', // Documentación oficial: dall-e-2 es el ÚNICO modelo soportado para /v1/images/edits
         image: imageFile,
         prompt: prompt,
         n: 1,
