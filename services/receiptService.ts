@@ -47,6 +47,27 @@ IMPORTANTE: Zelle NO incluye fecha ni hora. No agregues fecha ni hora a la image
 No señales los cambios. No agregues marcas, flechas ni recuadros. Debe parecer una captura de pantalla 100% auténtica.`;
   }
 
+  if (fields.bankType === 'bofa') {
+    return `Usa la fotografía del comprobante de Bank of America proporcionada como referencia.
+
+Regenera la fotografía manteniendo exactamente la misma hoja de papel horizontal de Bank of America ("Client Receipt"), la textura de madera del fondo, la iluminación y la inclinación de la foto.
+
+Modifica únicamente estos valores en la sección de texto impreso a la derecha:
+
+1. Número de cuenta:
+Modifica los últimos dígitos en "Trans:Deposit Acct#: *********${fields.account || '5441'}"
+
+2. Monto total:
+Modifica los montos en "Trans Total: ${formattedAmount}" y "Chk Amt: ${formattedAmount}"
+
+3. Fecha y Hora:
+Modifica la fecha y hora impresas arriba por "${fields.date || '01/24/2026'} ${fields.time || '12:51'}"
+Modifica la fecha en "Transaction Posts On: ${fields.date || '01/25/2026'}"
+
+Conserva intacto el logotipo "BANK OF AMERICA Client Receipt", la línea negra divisoria, el mensaje "Thank you for banking with us today" y todos los párrafos legales de la izquierda.
+No señales los cambios. No dibujes cuadros. No agregues flechas. Debe parecer una fotografía 100% auténtica.`;
+  }
+
   return `Usa la imagen proporcionada como referencia.
 
 Regenera la fotografía manteniendo exactamente el mismo recibo.
@@ -60,7 +81,7 @@ Modifica únicamente estos valores:
 ${fields.account || ''}
 
 Monto:
-${fields.amount || ''}
+${formattedAmount}
 
 Fecha:
 ${fields.date || ''}
@@ -98,9 +119,10 @@ export async function generateReceiptImage(
     // Use official OpenAI toFile utility function
     const imageFile = await toFile(buffer, 'receipt.png', { type: 'image/png' });
 
-    // Attempt OpenAI Images Edit API call
+    // Attempt OpenAI Images Edit API call (passing model: 'dall-e-2')
     try {
       const response = await openai.images.edit({
+        model: 'dall-e-2',
         image: imageFile,
         prompt: prompt,
         n: 1,
@@ -120,22 +142,33 @@ export async function generateReceiptImage(
         isMock: false,
       };
     } catch (editError: any) {
-      console.warn('Images edit endpoint fail, attempting DALL-E image generation with vision prompt:', editError?.message);
+      console.warn('Images edit endpoint fail, attempting DALL-E image generation fallback:', editError?.message);
 
-      // Alternative fallback using DALL-E-3 generation with photorealistic prompt
-      const dallePrompt = `Photorealistic crisp high-resolution photo of a bank payment receipt on paper texture with realistic lighting and shadows. Bank receipt showing account **** ${fields.account}, total amount ${fields.amount}, date ${fields.date}, time ${fields.time}. Authentic camera photograph style.`;
+      // Alternative fallback using DALL-E generation
+      let generatedUrl: string | undefined;
       
-      const dalleResponse = await openai.images.generate({
-        model: 'dall-e-3',
-        prompt: `${prompt}\n\n${dallePrompt}`,
-        n: 1,
-        size: '1024x1024',
-        quality: 'hd',
-      });
+      try {
+        const dalleResponse = await openai.images.generate({
+          model: 'dall-e-3',
+          prompt: `${prompt}\n\nPhotorealistic crisp high-resolution photo of a bank receipt on paper texture with realistic lighting and shadows.`,
+          n: 1,
+          size: '1024x1024',
+          quality: 'hd',
+        });
+        generatedUrl = dalleResponse?.data?.[0]?.url;
+      } catch (dalle3Error: any) {
+        console.warn('DALL-E 3 fallback failed, trying DALL-E 2 generation:', dalle3Error?.message);
+        const dalle2Response = await openai.images.generate({
+          model: 'dall-e-2',
+          prompt: prompt.slice(0, 950),
+          n: 1,
+          size: '1024x1024',
+        });
+        generatedUrl = dalle2Response?.data?.[0]?.url;
+      }
 
-      const generatedUrl = dalleResponse?.data?.[0]?.url;
       if (!generatedUrl) {
-        throw new Error('Falló la generación con DALL-E 3.');
+        throw new Error('Falló la generación con DALL-E.');
       }
 
       return {

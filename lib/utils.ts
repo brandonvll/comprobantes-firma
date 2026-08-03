@@ -103,90 +103,127 @@ export function createMockReceiptDataUrl(baseImageDataUrl: string, fields: Recei
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(zelleSvg)))}`;
   }
 
-  const account = fields.account || '7842';
-  const amount = fields.amount || '$1,250.00';
-  const date = fields.date || '08/07/2026';
-  const time = fields.time || '03:45 PM';
+  if (fields.bankType === 'bofa') {
+    const account = fields.account || '5441';
+    const rawAmount = fields.amount || '$850.00';
+    const amount = formatCurrencyString(rawAmount);
+    const date = fields.date || '01/24/2026';
+    const time = fields.time || '12:51 PM';
 
-  const svgContent = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
-      <defs>
-        <filter id="paper-texture">
-          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
-          <feDiffuseLighting in="noise" lighting-color="#fff" surfaceScale="2" result="light">
-            <feDistantLight azimuth="60" elevation="50" />
-          </feDiffuseLighting>
-          <feBlend mode="multiply" in="SourceGraphic" in2="light" result="blend"/>
-        </filter>
-        <linearGradient id="vignette" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#fdfbf7" />
-          <stop offset="100%" stop-color="#e2ded4" />
-        </linearGradient>
-      </defs>
+    const bofaSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+        <defs>
+          <filter id="paper-shadow">
+            <feDropShadow dx="2" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+        <!-- Dark wood background -->
+        <rect width="800" height="480" fill="#2b231f"/>
+        
+        <!-- White horizontal paper sheet -->
+        <g transform="translate(40, 30) rotate(-0.5, 360, 210)" filter="url(#paper-shadow)">
+          <rect width="720" height="420" fill="#fcfcfc" rx="2"/>
+          
+          <!-- Header -->
+          <!-- Bank of America Logo -->
+          <text x="40" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="bold" fill="#002d72" letter-spacing="1">BANK OF AMERICA</text>
+          <!-- Red flag symbol -->
+          <g transform="translate(255, 27)">
+            <polygon points="0,0 12,0 8,16 0,16" fill="#d4001a"/>
+            <polygon points="12,0 24,0 20,16 9,16" fill="#d4001a"/>
+            <polygon points="24,0 34,0 30,16 19,16" fill="#d4001a"/>
+          </g>
+          <!-- Client Receipt right aligned -->
+          <text x="680" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="16" fill="#1e293b" text-anchor="end">Client Receipt</text>
+          
+          <!-- Divider line -->
+          <line x1="40" y1="60" x2="680" y2="60" stroke="#000000" stroke-width="1.5"/>
+          
+          <!-- Left side thank you & disclosures -->
+          <text x="40" y="85" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e293b">Thank you for banking with us today.</text>
+          
+          <text x="40" y="110" font-family="Arial, sans-serif" font-size="9" fill="#475569">To help protect you and us from losses if a check(s) is returned unpaid, all deposits are subject to a hold review at any time. It's important you know</text>
+          <text x="40" y="122" font-family="Arial, sans-serif" font-size="9" fill="#475569">that deposit holds can result in a reduction of your available balance. For more information, please refer to your Deposit Agreement &amp; Disclosures at</text>
+          <text x="40" y="134" font-family="Arial, sans-serif" font-size="9" fill="#475569">bankofamerica.com/deposits/resources/deposit-agreements.go.deposit.</text>
+          
+          <text x="40" y="158" font-family="Arial, sans-serif" font-size="9" fill="#475569">Please save this receipt until you see the transaction completed on</text>
+          <text x="40" y="170" font-family="Arial, sans-serif" font-size="9" fill="#475569">your statement. Transactions are credited subject to verification,</text>
+          <text x="40" y="182" font-family="Arial, sans-serif" font-size="9" fill="#475569">collection, and the terms of your account. Keep in mind,</text>
+          <text x="40" y="194" font-family="Arial, sans-serif" font-size="9" fill="#475569">transactions made in a financial center on non-business days</text>
+          <text x="40" y="206" font-family="Arial, sans-serif" font-size="9" fill="#475569">(Saturday, Sunday, and bank holidays) aren't processed until the</text>
+          <text x="40" y="218" font-family="Arial, sans-serif" font-size="9" fill="#475569">next business day we're open.</text>
+          
+          <text x="40" y="244" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#1e293b">Visit bankofamerica.com to learn more about how you can</text>
+          <text x="40" y="256" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#1e293b">receive money fast through electronic payment methods like</text>
+          <text x="40" y="268" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#1e293b">direct deposit, Zelle®, ACH, and wires.</text>
+          
+          <text x="40" y="296" font-family="Arial, sans-serif" font-size="8" fill="#64748b">Zelle® and the Zelle related marks are wholly owned by Early Warning Services,</text>
+          <text x="40" y="306" font-family="Arial, sans-serif" font-size="8" fill="#64748b">LLC and used herein under license. Terms and conditions apply.</text>
+          
+          <text x="40" y="326" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#334155">Member FDIC</text>
+          <text x="40" y="340" font-family="Arial, sans-serif" font-size="9" fill="#64748b">95-14-2005B 07-2024</text>
+          
+          <!-- Right side transaction printout (dot matrix / thermal printer text) -->
+          <g font-family="'Courier New', monospace" font-size="13" fill="#383838" letter-spacing="0.5">
+            <text x="460" y="170">${date} ${time} Assoc: 771</text>
+            <text x="460" y="188">NC Center: 0050900 Seq#: 067</text>
+            <text x="460" y="206">Trans:Deposit Acct#: *********${account}</text>
+            <text x="460" y="224">Trans Total: ${amount}</text>
+            
+            <text x="460" y="254">Chk Amt: ${amount}</text>
+            <text x="460" y="272">Transaction Posts On: ${date}</text>
+          </g>
+        </g>
+      </svg>
+    `;
+    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(bofaSvg)))}`;
+  }
+
+  const account = fields.account || '2274';
+  const rawAmount = fields.amount || '$3,000.00';
+  const amount = formatCurrencyString(rawAmount);
+  const date = fields.date || '07/25/2026';
+  const time = fields.time || '11:02 AM';
+
+  const chaseSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="750" viewBox="0 0 400 750">
+      <rect width="400" height="750" fill="#1e293b"/>
       
-      <!-- Receipt Background with shadow & texture -->
-      <rect width="600" height="900" fill="#1e293b"/>
-      <rect x="50" y="40" width="500" height="820" rx="4" fill="url(#vignette)" filter="url(#paper-texture)"/>
-      <rect x="50" y="40" width="500" height="820" rx="4" fill="none" stroke="#d1d5db" stroke-width="1"/>
-      
-      <!-- Bank Header Logo Mock -->
-      <g transform="translate(240, 80)">
-        <rect x="0" y="0" width="120" height="35" rx="6" fill="#00529b"/>
-        <text x="60" y="24" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">BANK COMPROBANTE</text>
+      <!-- Vertical thermal paper strip -->
+      <g transform="translate(30, 20)">
+        <rect width="340" height="710" fill="#f8fafc" rx="4"/>
+        
+        <!-- Chase Logo -->
+        <text x="170" y="55" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="extrabold" fill="#00529b" text-anchor="middle" letter-spacing="2">CHASE</text>
+        <rect x="235" y="38" width="18" height="18" fill="#00529b"/>
+        
+        <text x="170" y="85" font-family="'Courier New', monospace" font-size="10" fill="#64748b" text-anchor="middle">Deposit cash or checks</text>
+        <text x="170" y="98" font-family="'Courier New', monospace" font-size="10" fill="#64748b" text-anchor="middle">at most Chase ATMs.</text>
+        
+        <text x="170" y="125" font-family="'Courier New', monospace" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">My Transaction Summary</text>
+        <line x1="20" y1="135" x2="320" y2="135" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1"/>
+        
+        <!-- Transaction details -->
+        <text x="25" y="165" font-family="'Courier New', monospace" font-size="12" fill="#1e293b">Transacción #31</text>
+        <text x="25" y="183" font-family="'Courier New', monospace" font-size="12" fill="#475569">Número de cuenta que termina en: ${account}</text>
+        <text x="25" y="201" font-family="'Courier New', monospace" font-size="12" fill="#475569">Depósito en cuenta</text>
+        <text x="315" y="201" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="end">${amount}</text>
+        
+        <line x1="20" y1="230" x2="320" y2="230" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+        
+        <text x="25" y="260" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#1e293b">Pagar en</text>
+        <text x="315" y="260" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="end">${amount}</text>
+        
+        <line x1="20" y1="290" x2="320" y2="290" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1"/>
+        
+        <!-- Bottom info -->
+        <text x="170" y="340" font-family="'Courier New', monospace" font-size="11" fill="#64748b" text-anchor="middle">JPMorgan Chase Bank, N.A.</text>
+        <text x="170" y="358" font-family="'Courier New', monospace" font-size="11" fill="#64748b" text-anchor="middle">Member FDIC, Equal Housing Lender</text>
+        <text x="170" y="380" font-family="'Courier New', monospace" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">Please keep your receipt</text>
+        
+        <text x="170" y="415" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">${date} ${time}</text>
       </g>
-      
-      <!-- Receipt Info Text -->
-      <text x="300" y="150" font-family="'Courier New', monospace" font-size="14" fill="#64748b" text-anchor="middle">COMPROBANTE DE TRANSACCION DEBITO</text>
-      <line x1="90" y1="175" x2="510" y2="175" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="1.5"/>
-      
-      <!-- Details -->
-      <text x="90" y="230" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#334155">ESTADO:</text>
-      <text x="510" y="230" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#16a34a" text-anchor="end">EXITOSO / APROBADO</text>
-      
-      <!-- Modified Fields -->
-      <text x="90" y="290" font-family="'Courier New', monospace" font-size="16" fill="#475569">CUENTA DESTINO:</text>
-      <text x="510" y="290" font-family="'Courier New', monospace" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="end">**** ${account}</text>
-      
-      <text x="90" y="360" font-family="'Courier New', monospace" font-size="16" fill="#475569">MONTO TOTAL:</text>
-      <text x="510" y="360" font-family="'Courier New', monospace" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="end">${amount}</text>
-      
-      <text x="90" y="430" font-family="'Courier New', monospace" font-size="16" fill="#475569">FECHA:</text>
-      <text x="510" y="430" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="end">${date}</text>
-      
-      <text x="90" y="500" font-family="'Courier New', monospace" font-size="16" fill="#475569">HORA:</text>
-      <text x="510" y="500" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="end">${time}</text>
-      
-      <line x1="90" y1="540" x2="510" y2="540" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="1.5"/>
-      
-      <!-- Reference & Security -->
-      <text x="90" y="590" font-family="'Courier New', monospace" font-size="14" fill="#64748b">NO. REFERENCIA:</text>
-      <text x="510" y="590" font-family="'Courier New', monospace" font-size="14" fill="#334155" text-anchor="end">REF-984201948271</text>
-      
-      <text x="90" y="640" font-family="'Courier New', monospace" font-size="14" fill="#64748b">TIPO DE OPERACION:</text>
-      <text x="510" y="640" font-family="'Courier New', monospace" font-size="14" fill="#334155" text-anchor="end">TRANSFERENCIA INTERBANCARIA</text>
-      
-      <line x1="90" y1="680" x2="510" y2="680" stroke="#cbd5e1" stroke-width="1"/>
-      
-      <!-- Barcode simulation -->
-      <g transform="translate(150, 720)">
-        <rect x="0" y="0" width="300" height="40" fill="#000" fill-opacity="0.85"/>
-        <rect x="10" y="0" width="8" height="40" fill="#fff"/>
-        <rect x="25" y="0" width="14" height="40" fill="#fff"/>
-        <rect x="45" y="0" width="6" height="40" fill="#fff"/>
-        <rect x="65" y="0" width="18" height="40" fill="#fff"/>
-        <rect x="95" y="0" width="10" height="40" fill="#fff"/>
-        <rect x="115" y="0" width="6" height="40" fill="#fff"/>
-        <rect x="135" y="0" width="22" height="40" fill="#fff"/>
-        <rect x="170" y="0" width="8" height="40" fill="#fff"/>
-        <rect x="190" y="0" width="15" height="40" fill="#fff"/>
-        <rect x="220" y="0" width="6" height="40" fill="#fff"/>
-        <rect x="240" y="0" width="18" height="40" fill="#fff"/>
-        <rect x="270" y="0" width="10" height="40" fill="#fff"/>
-      </g>
-      <text x="300" y="785" font-family="'Courier New', monospace" font-size="12" fill="#64748b" text-anchor="middle">* GPT IMAGE AI SYNTHESIZED *</text>
-      <text x="300" y="820" font-family="'Courier New', monospace" font-size="11" fill="#94a3b8" text-anchor="middle">Conserva textura, iluminación y perspectiva original</text>
     </svg>
   `;
-
-  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgContent)))}`;
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(chaseSvg)))}`;
 }
