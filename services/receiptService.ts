@@ -64,7 +64,8 @@ Modifica los montos en "Trans Total: ${formattedAmount}" y "Chk Amt: ${formatted
 Modifica la fecha y hora impresas arriba por "${fields.date || '01/24/2026'} ${fields.time || '12:51'}"
 Modifica la fecha en "Transaction Posts On: ${fields.date || '01/25/2026'}"
 
-Conserva intacto el logotipo "BANK OF AMERICA Client Receipt", la línea negra divisoria, el mensaje "Thank you for banking with us today" y todos los párrafos legales de la izquierda.
+Conserva intacto el logotipo "BANK OF AMERICA" con su símbolo oficial de bandera roja de franjas diagonales a la izquierda.
+POSICIÓN DEL ENCABEZADO: El texto "Client Receipt" debe ir ubicado en el CENTRO del encabezado (al lado del logo de Bank of America, NO al extremo derecho).
 IMPORTANTE: Mantén el bloque de texto impreso a la derecha alineado hacia el centro de la hoja para garantizar un margen derecho amplio y limpio, evitando que los números finales (cuenta y fecha) se recorten o queden pegados al borde.
 No señales los cambios. No dibujes cuadros. No agregues flechas. Debe parecer una fotografía 100% auténtica.`;
   }

@@ -126,15 +126,22 @@ export function createMockReceiptDataUrl(baseImageDataUrl: string, fields: Recei
           
           <!-- Header -->
           <!-- Bank of America Logo -->
-          <text x="40" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="bold" fill="#002d72" letter-spacing="1">BANK OF AMERICA</text>
-          <!-- Red flag symbol -->
-          <g transform="translate(255, 27)">
-            <polygon points="0,0 12,0 8,16 0,16" fill="#d4001a"/>
-            <polygon points="12,0 24,0 20,16 9,16" fill="#d4001a"/>
-            <polygon points="24,0 34,0 30,16 19,16" fill="#d4001a"/>
+          <text x="40" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="19" font-weight="bold" fill="#002d72" letter-spacing="1">BANK OF AMERICA</text>
+          
+          <!-- Authentic Bank of America Red Flag Symbol -->
+          <g transform="translate(252, 28)">
+            <!-- Top slants -->
+            <polygon points="0,0 9,0 5,7 0,7" fill="#d4001a"/>
+            <polygon points="12,0 21,0 17,7 12,7" fill="#d4001a"/>
+            <polygon points="24,0 33,0 29,7 24,7" fill="#d4001a"/>
+            <!-- Bottom slants -->
+            <polygon points="3,9 12,9 8,16 3,16" fill="#d4001a"/>
+            <polygon points="15,9 24,9 20,16 15,16" fill="#d4001a"/>
+            <polygon points="27,9 36,9 32,16 27,16" fill="#d4001a"/>
           </g>
-          <!-- Client Receipt right aligned -->
-          <text x="680" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="16" fill="#1e293b" text-anchor="end">Client Receipt</text>
+          
+          <!-- Client Receipt centered in header -->
+          <text x="510" y="45" font-family="'Helvetica Neue', Arial, sans-serif" font-size="16" fill="#1e293b" text-anchor="middle">Client Receipt</text>
           
           <!-- Divider line -->
           <line x1="40" y1="60" x2="680" y2="60" stroke="#000000" stroke-width="1.5"/>
