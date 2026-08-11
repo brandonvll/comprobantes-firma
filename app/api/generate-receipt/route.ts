@@ -5,7 +5,7 @@ import { GenerateReceiptRequest } from '@/types/receipt';
 export async function POST(req: NextRequest) {
   try {
     const body: GenerateReceiptRequest = await req.json();
-    const { image, fields } = body;
+    const { image, fields, templateId } = body;
 
     if (!image) {
       return NextResponse.json(
@@ -14,17 +14,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!fields || !fields.amount) {
+    const activeTemplateId = templateId || fields?.templateId || 'chase';
+
+    if (!fields) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Se requiere el monto para generar el comprobante.',
+          error: 'Se requieren los campos para generar el comprobante.',
         },
         { status: 400 }
       );
     }
 
-    const result = await generateReceiptImage({ image, fields });
+    const result = await generateReceiptImage({ image, fields, templateId: activeTemplateId });
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('API Error in generate-receipt:', error);

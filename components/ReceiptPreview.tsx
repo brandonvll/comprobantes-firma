@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Download, ZoomIn, ZoomOut, Check, ArrowRightLeft, Sparkles, AlertCircle } from 'lucide-react';
 import { downloadImage } from '@/lib/utils';
 import { ReceiptFields } from '@/types/receipt';
+import { templates } from '@/templates/registry';
 
 interface ReceiptPreviewProps {
   originalImage: string;
@@ -23,12 +24,18 @@ export function ReceiptPreview({
 
   const handleDownload = () => {
     if (generatedImage) {
-      const filename = `comprobante-${fields.account || 'modificado'}.png`;
+      const filename = `comprobante-modificado.png`;
       downloadImage(generatedImage, filename);
     }
   };
 
   if (!generatedImage) return null;
+
+  const activeTemplateId = fields.templateId || 'chase';
+  const activeTemplate = templates[activeTemplateId];
+  if (!activeTemplate) return null;
+  
+  const textColor = activeTemplate.config.color.replace('bg-', 'text-');
 
   return (
     <div className="w-full rounded-2xl border border-emerald-500/30 bg-slate-900/80 p-6 backdrop-blur-md shadow-2xl space-y-6">
@@ -155,41 +162,16 @@ export function ReceiptPreview({
       </div>
 
       {/* Summary of modified values */}
-      {fields.bankType === 'zelle' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Monto Enviado</span>
-            <span className="text-sm font-bold text-purple-400 font-mono">{fields.amount}</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+        {activeTemplate.fields.map(field => (
+          <div key={field.id}>
+            <span className="text-[11px] text-slate-400 font-medium block">{field.label}</span>
+            <span className={`text-sm font-bold ${textColor} font-mono`}>
+              {fields[field.id] || field.defaultValue || '---'}
+            </span>
           </div>
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Nombre Registrado</span>
-            <span className="text-sm font-bold text-purple-400 font-sans">{fields.recipientName || 'Felipe Gonzalez'}</span>
-          </div>
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Teléfono / Correo</span>
-            <span className="text-sm font-bold text-purple-400 font-mono">{fields.contactInfo || '(407) 415-4294'}</span>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Cuenta Actualizada</span>
-            <span className="text-sm font-bold text-emerald-400 font-mono">**** {fields.account || '---'}</span>
-          </div>
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Monto Actualizado</span>
-            <span className="text-sm font-bold text-emerald-400 font-mono">{fields.amount}</span>
-          </div>
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Fecha Actualizada</span>
-            <span className="text-sm font-bold text-emerald-400 font-mono">{fields.date || '---'}</span>
-          </div>
-          <div>
-            <span className="text-[11px] text-slate-400 font-medium block">Hora Actualizada</span>
-            <span className="text-sm font-bold text-emerald-400 font-mono">{fields.time || '---'}</span>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

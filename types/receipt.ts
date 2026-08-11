@@ -1,19 +1,11 @@
-export type BankType = 'chase' | 'bofa' | 'zelle' | 'general';
+export type BankType = 'chase' | 'bofa' | 'zelle' | 'general' | string;
 
-export interface ReceiptFields {
-  bankType?: BankType;
-  account?: string;
-  amount: string;
-  date?: string;
-  time?: string;
-  recipientName?: string;
-  contactInfo?: string;
-}
+export type ReceiptFields = Record<string, string>;
 
 export interface AnalyzeReceiptResponse {
   success: boolean;
   fields?: ReceiptFields;
-  bankName?: string;
+  templateId?: string;
   error?: string;
   rawText?: string;
 }
@@ -21,6 +13,7 @@ export interface AnalyzeReceiptResponse {
 export interface GenerateReceiptRequest {
   image: string; // base64 string or data URL
   fields: ReceiptFields;
+  templateId: string;
 }
 
 export interface GenerateReceiptResponse {

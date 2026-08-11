@@ -1,5 +1,7 @@
 import { getOpenAIClient } from '@/lib/openai';
 import { AnalyzeReceiptResponse, ReceiptFields } from '@/types/receipt';
+import { detectTemplate, templates } from '@/templates/registry';
+import { processImageInput } from '@/lib/imageUtils';
 
 export async function analyzeReceiptWithVision(imageBase64: string): Promise<AnalyzeReceiptResponse> {
   const openai = getOpenAIClient();
@@ -9,20 +11,18 @@ export async function analyzeReceiptWithVision(imageBase64: string): Promise<Ana
     return {
       success: true,
       fields: {
+        templateId: 'chase',
         account: '7842',
         amount: '$1,250.00',
         date: '08/07/2026',
         time: '03:45 PM',
       },
-      bankName: 'Banco Detectado (Modo Demo)',
+      templateId: 'chase',
     };
   }
 
   try {
-    // Ensure data URL prefix is handled
-    const formattedImage = imageBase64.startsWith('data:') 
-      ? imageBase64 
-      : `data:image/jpeg;base64,${imageBase64}`;
+    const processedImage = await processImageInput(imageBase64);
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
@@ -30,17 +30,17 @@ export async function analyzeReceiptWithVision(imageBase64: string): Promise<Ana
         {
           role: 'system',
           content: `Eres un experto en extracción OCR de comprobantes y recibos bancarios. 
-Analiza la imagen proporcionada e identifica si es un comprobante de Zelle, Chase, Bank of America u otro banco.
-Responde ÚNICAMENTE en formato JSON estricto con las siguientes claves:
+Analiza la imagen proporcionada y extrae todo el texto relevante. 
+No te preocupes por el formato del banco, simplemente extrae toda la información financiera que encuentres.
+Responde ÚNICAMENTE en formato JSON estricto con las siguientes claves (deja vacío si no encuentras el dato):
 {
-  "bankType": "zelle" | "chase" | "bofa" | "general",
-  "amount": "monto total formateado con símbolo de moneda si aplica (ej. $125.00)",
-  "account": "últimos 4 dígitos de la cuenta si aplica (ej. 2274)",
-  "date": "fecha si aplica (ej. 08/07/2026)",
-  "time": "hora si aplica (ej. 03:45 PM)",
-  "recipientName": "nombre del destinatario / registrado como si es Zelle (ej. Felipe Gonzalez)",
-  "contactInfo": "número de teléfono o correo electrónico si es Zelle (ej. (407) 415-4294)",
-  "bankName": "nombre del banco o entidad"
+  "rawTextDump": "Todo el texto crudo extraído de la imagen para propósitos de clasificación",
+  "amount": "monto total formateado con símbolo de moneda",
+  "account": "últimos 4 dígitos de la cuenta",
+  "date": "fecha de la transacción",
+  "time": "hora de la transacción",
+  "recipientName": "nombre del destinatario o persona registrada",
+  "contactInfo": "número de teléfono o correo electrónico"
 }`,
         },
         {
@@ -48,12 +48,12 @@ Responde ÚNICAMENTE en formato JSON estricto con las siguientes claves:
           content: [
             {
               type: 'text',
-              text: 'Extrae automáticamente los campos de este comprobante.',
+              text: 'Extrae automáticamente los campos y todo el texto de este comprobante.',
             },
             {
               type: 'image_url',
               image_url: {
-                url: formattedImage,
+                url: processedImage.dataUrl,
                 detail: 'high',
               },
             },
@@ -70,22 +70,23 @@ Responde ÚNICAMENTE en formato JSON estricto con las siguientes claves:
     }
 
     const parsed = JSON.parse(content);
+    
+    // Pass raw text through detector
+    const detectedTemplate = detectTemplate(parsed.rawTextDump || '') || templates['chase'];
+
+    // Map fields specifically for this template
+    const mappedFields = detectedTemplate.mapFields(parsed);
 
     const fields: ReceiptFields = {
-      bankType: parsed.bankType || 'general',
-      amount: parsed.amount || '$100.00',
-      account: parsed.account || '',
-      date: parsed.date || '',
-      time: parsed.time || '',
-      recipientName: parsed.recipientName || '',
-      contactInfo: parsed.contactInfo || '',
+      templateId: detectedTemplate.config.id,
+      ...mappedFields
     };
 
     return {
       success: true,
       fields,
-      bankName: parsed.bankName || 'Banco Detectado',
-      rawText: content,
+      templateId: detectedTemplate.config.id,
+      rawText: parsed.rawTextDump,
     };
   } catch (error: any) {
     console.error('Error analyzing receipt with Vision:', error);
@@ -94,7 +95,7 @@ Responde ÚNICAMENTE en formato JSON estricto con las siguientes claves:
       success: false,
       error: error.message || 'Error al analizar la imagen con Vision.',
       fields: {
-        bankType: 'general',
+        templateId: 'general',
         amount: '$100.00',
         account: '7842',
         date: '08/07/2026',

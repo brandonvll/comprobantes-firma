@@ -21,7 +21,7 @@ export default function Home() {
 
   // Form Fields State
   const [fields, setFields] = useState<ReceiptFields>({
-    bankType: 'chase',
+    templateId: 'chase',
     account: '2274',
     amount: '$3,000.00',
     date: '07/25/2026',
@@ -71,10 +71,7 @@ export default function Home() {
       const data = await res.json();
       if (data.success && data.fields) {
         setFields(data.fields);
-        const details = data.fields.bankType === 'zelle'
-          ? `Zelle detectado: Monto (${data.fields.amount}), Nombre (${data.fields.recipientName}), Contacto (${data.fields.contactInfo}).`
-          : `Campos: Cuenta (**** ${data.fields.account || '---'}), Monto (${data.fields.amount}), Fecha (${data.fields.date || '---'}), Hora (${data.fields.time || '---'}).`;
-        addToast('success', '¡Campos detectados con IA!', details);
+        addToast('success', '¡Campos detectados con IA!', 'Se ha cargado la plantilla y extraído los campos correctamente.');
       } else {
         addToast('info', 'Formulario listo', 'Puedes ajustar los valores manualmente.');
       }
@@ -85,37 +82,49 @@ export default function Home() {
     }
   };
 
-  const handleFieldChange = (field: keyof ReceiptFields, value: string) => {
+  const handleFieldChange = (field: string, value: string) => {
     setFields((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleBankTypeChange = (newBankType: 'chase' | 'bofa' | 'zelle' | 'general') => {
-    setFields((prev) => {
-      if (newBankType === 'zelle') {
-        return {
-          ...prev,
-          bankType: 'zelle',
-          amount: prev.amount || '$125.00',
-          recipientName: prev.recipientName || 'Felipe Gonzalez',
-          contactInfo: prev.contactInfo || '(407) 415-4294',
-        };
-      }
-      return {
-        ...prev,
-        bankType: newBankType,
-        account: prev.account || '2274',
-        amount: prev.amount || '$1,250.00',
-        date: prev.date || '08/07/2026',
-        time: prev.time || '03:45 PM',
-      };
-    });
+  const handleBankTypeChange = async (newTemplateId: string) => {
+    try {
+      const { templates } = await import('@/templates/registry');
+      const activeTemplate = templates[newTemplateId];
+      if (!activeTemplate) return;
+
+      const newFields: ReceiptFields = { templateId: newTemplateId };
+      activeTemplate.fields.forEach(f => {
+        newFields[f.id] = f.defaultValue || '';
+      });
+
+      setFields(newFields);
+    } catch(err) {
+      console.error("Error loading template registry", err);
+    }
   };
 
-  const handlePresetSelect = (preset: PresetReceipt) => {
-    setSelectedImage(preset.imageUrl);
-    setGeneratedImage(null);
-    setFields(preset.fields);
-    addToast('info', `Cargado comprobante de ${preset.bank}`, 'Valores iniciales listos para modificar.');
+  const handlePresetSelect = async (preset: PresetReceipt) => {
+    try {
+      let base64Image = preset.imageUrl;
+      if (!preset.imageUrl.startsWith('data:')) {
+        const res = await fetch(preset.imageUrl);
+        const blob = await res.blob();
+        base64Image = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
+      setSelectedImage(base64Image);
+      setGeneratedImage(null);
+      setFields({ ...preset.fields, templateId: preset.fields.bankType || preset.id });
+      addToast('info', `Cargado comprobante de ${preset.bank}`, 'Valores iniciales listos para modificar.');
+    } catch (err) {
+      console.error('Error loading preset image:', err);
+      setSelectedImage(preset.imageUrl);
+      setFields(preset.fields);
+    }
   };
 
   const handleClearImage = () => {
@@ -141,6 +150,7 @@ export default function Home() {
         body: JSON.stringify({
           image: selectedImage,
           fields: fields,
+          templateId: fields.templateId || 'chase',
         }),
       });
 
