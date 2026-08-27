@@ -110,7 +110,7 @@ export function ReceiptForm({
       {/* Dynamic Fields Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {activeTemplate.fields.map((field) => (
-          <div key={field.id} className={`space-y-1.5 ${activeTemplateId === 'zelle' ? 'sm:col-span-2' : ''}`}>
+          <div key={field.id} className={`space-y-1.5 ${field.id === 'account' || field.id === 'recipientName' ? 'sm:col-span-2' : ''}`}>
             <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
               {getFieldIcon(field.id, themeColor)}
               <span>{field.label}</span>

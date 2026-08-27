@@ -245,7 +245,7 @@ export default function Home() {
               </h3>
               <p className="text-xs text-slate-400">
                 {fields.bankType === 'zelle'
-                  ? 'Zelle: Modifica monto, nombre registrado y teléfono/correo. Sin fecha ni hora.'
+                  ? 'Zelle (Bank of America): Modifica monto, destinatario, teléfono/correo, cuenta de origen, fecha y número de confirmación.'
                   : 'La IA sustituirá únicamente los campos indicados sin añadir marcas ni recuadros.'}
               </p>
             </div>

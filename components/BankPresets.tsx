@@ -34,13 +34,16 @@ export const PRESET_RECEIPTS: PresetReceipt[] = [
   {
     id: 'zelle',
     name: 'Comprobante Zelle',
-    bank: 'Zelle',
-    imageUrl: '/Zelle/WhatsApp%20Image%202026-08-02%20at%205.48.31%20PM.jpeg',
+    bank: 'Zelle (BofA)',
+    imageUrl: '/Zelle/zelle_bofa_reference.jpeg',
     fields: {
       bankType: 'zelle',
-      amount: '$125.00',
-      recipientName: 'Felipe Gonzalez',
-      contactInfo: '(407) 415-4294',
+      amount: '$438.00',
+      recipientName: 'NATHALIE DIAZ',
+      contactInfo: '305-848-2711',
+      account: 'Adv SafeBalance Banking - 4042',
+      date: 'ago 26, 2026',
+      confirmationNumber: 'vfwqisvbu',
     },
   },
 ];

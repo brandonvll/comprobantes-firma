@@ -4,72 +4,104 @@ import { formatCurrencyString } from '@/lib/utils';
 export const zelleTemplate: ReceiptTemplate = {
   config: {
     id: 'zelle',
-    name: 'Zelle',
+    name: 'Zelle (Bank of America)',
     color: 'bg-purple-600',
   },
   fields: [
-    { id: 'amount', label: 'Monto Enviado', type: 'currency', placeholder: '$0.00', defaultValue: '$125.00' },
-    { id: 'recipientName', label: 'Nombre Registrado', type: 'text', placeholder: 'Nombre del destinatario', defaultValue: 'Felipe Gonzalez' },
-    { id: 'contactInfo', label: 'Teléfono o Correo', type: 'text', placeholder: '(555) 555-5555', defaultValue: '(407) 415-4294' },
+    { id: 'amount', label: 'Cantidad (Monto)', type: 'currency', placeholder: '$438.00', defaultValue: '$438.00' },
+    { id: 'recipientName', label: 'Nombre Destinatario', type: 'text', placeholder: 'NATHALIE DIAZ', defaultValue: 'NATHALIE DIAZ' },
+    { id: 'contactInfo', label: 'Teléfono o Correo', type: 'text', placeholder: '305-848-2711', defaultValue: '305-848-2711' },
+    { id: 'account', label: 'Cuenta de Origen (Desde)', type: 'text', placeholder: 'Adv SafeBalance Banking - 4042', defaultValue: 'Adv SafeBalance Banking - 4042' },
+    { id: 'date', label: 'Fecha', type: 'text', placeholder: 'ago 26, 2026', defaultValue: 'ago 26, 2026' },
+    { id: 'confirmationNumber', label: 'Número de Confirmación', type: 'text', placeholder: 'vfwqisvbu', defaultValue: 'vfwqisvbu' },
   ],
   buildPrompt: (fields) => `
-ESTRICTO: Modifica los siguientes campos en la imagen para una confirmación de Zelle respetando el formato, estilo, fuente, perspectiva y sombras. 
-NO ALTERES el logo, el botón de "Listo" ni el botón de "Añadir a Siri" (manten el logo azul colorido de Siri intacto). 
-No cambies la fecha ni agregues horas si no estaban.
-- Cambia el texto secundario "Estamos enviando tu dinero ahora." para que contenga: ${fields.recipientName}
-- Cambia el Monto enviado (grande en el centro) por: ${fields.amount}
-- Cambia el nombre en el avatar y debajo del monto por: ${fields.recipientName} Zelle
-- Cambia "Registrado como" por: ${String(fields.recipientName).toUpperCase()}
-- Cambia el teléfono o correo debajo por: ${fields.contactInfo}
-- En el cuadro gris inferior (Siri), cambia el nombre en "Paga a [Nombre]" usando el primer nombre de: ${fields.recipientName}
-MANTÉN EL 100% DE LA FOTOGRAFÍA ORIGINAL DE REFERENCIA SIN ALTERAR EL LOGO NI LOS BOTONES INFERIORES.
+ESTRICTO: Modifica los siguientes campos en la imagen de confirmación de transferencia Zelle de Bank of America ("Su pago fue enviado") respetando el formato, fuente, alineación, color de texto y estilo original.
+NO ALTERES el ícono verde de verificación (✓), los títulos "Éxito" y "Su pago fue enviado", el enlace "Imprimir o guardar", las líneas divisorias, la sección de divulgaciones legales ni el botón "HECHO".
+
+Campos a sustituir:
+- En la sección "A" (Destinatario):
+  * Cambia el nombre del destinatario por: ${fields.recipientName || 'NATHALIE DIAZ'}
+  * Cambia el teléfono/correo por: ${fields.contactInfo || '305-848-2711'}
+  * Cambia "Inscrito como" por: Inscrito como ${fields.recipientName || 'NATHALIE DIAZ'}
+  * Cambia la inicial dentro del avatar circular por la primera letra del nombre (${(fields.recipientName || 'NATHALIE DIAZ').trim().charAt(0).toUpperCase()})
+- En la fila "Desde" (Cuenta de origen):
+  * Cambia el texto/cuenta por: ${fields.account || 'Adv SafeBalance Banking - 4042'}
+- En la fila "Cantidad":
+  * Cambia el monto por: ${fields.amount || '$438.00'}
+- En la fila "Fecha":
+  * Cambia la fecha por: ${fields.date || 'ago 26, 2026'}
+- En la fila "Número de confirmación":
+  * Cambia el número de confirmación por: ${fields.confirmationNumber || 'vfwqisvbu'}
+
+CONSERVA EL 100% DE LA FOTOGRAFÍA ORIGINAL DE REFERENCIA SIN ALTERAR ENCABEZADOS, DIVISORES, NI BOTONES INFERIORES.
   `,
   detect: (rawText) => {
     const text = rawText.toLowerCase();
-    return text.includes('zelle') || text.includes('estamos enviando tu dinero');
+    return (
+      text.includes('zelle') ||
+      text.includes('su pago fue enviado') ||
+      text.includes('inscrito como') ||
+      text.includes('número de confirmación') ||
+      text.includes('numero de confirmacion') ||
+      text.includes('divulgaciones legales')
+    );
   },
   mapFields: (extractedData: any) => {
     return {
-      amount: extractedData.amount || '$125.00',
-      recipientName: extractedData.recipientName || 'Felipe Gonzalez',
-      contactInfo: extractedData.contactInfo || '(407) 415-4294',
+      amount: extractedData.amount || '$438.00',
+      recipientName: extractedData.recipientName || 'NATHALIE DIAZ',
+      contactInfo: extractedData.contactInfo || '305-848-2711',
+      account: extractedData.account || 'Adv SafeBalance Banking - 4042',
+      date: extractedData.date || 'ago 26, 2026',
+      confirmationNumber: extractedData.confirmationNumber || 'vfwqisvbu',
     };
   },
   mockSvg: (baseImageDataUrl, fields) => {
-    const rawAmount = fields.amount || '$125.00';
+    const rawAmount = fields.amount || '$438.00';
     const amount = formatCurrencyString(rawAmount);
-    const recipientName = fields.recipientName || 'Felipe Gonzalez';
-    const contactInfo = fields.contactInfo || '(407) 415-4294';
-    const firstName = recipientName.trim().split(' ')[0] || 'Felipe';
+    const recipientName = fields.recipientName || 'NATHALIE DIAZ';
+    const contactInfo = fields.contactInfo || '305-848-2711';
+    const account = fields.account || 'Adv SafeBalance Banking - 4042';
+    const date = fields.date || 'ago 26, 2026';
+    const confirmationNumber = fields.confirmationNumber || 'vfwqisvbu';
+    const initialLetter = recipientName.trim().charAt(0).toUpperCase() || 'N';
+
     const isDataOrPath = Boolean(baseImageDataUrl && (baseImageDataUrl.startsWith('data:') || baseImageDataUrl.startsWith('/') || baseImageDataUrl.startsWith('http')));
-    const bgImage = isDataOrPath ? baseImageDataUrl : '/Zelle/WhatsApp%20Image%202026-08-02%20at%205.48.31%20PM.jpeg';
+    const bgImage = isDataOrPath ? baseImageDataUrl : '/Zelle/zelle_bofa_reference.jpeg';
 
     const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="576" height="1024" viewBox="0 0 576 1024">
-        <image href="${bgImage}" x="0" y="0" width="576" height="1024" preserveAspectRatio="none"/>
+      <svg xmlns="http://www.w3.org/2000/svg" width="736" height="1600" viewBox="0 0 736 1600">
+        <image href="${bgImage}" x="0" y="0" width="736" height="1600" preserveAspectRatio="none"/>
         
-        <!-- Overlay patches for modified fields on top of original photo -->
-        <!-- Subtitle message patch -->
-        <rect x="70" y="196" width="436" height="46" fill="#ffffff"/>
-        <text x="288" y="214" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#334155" text-anchor="middle">Estamos enviando tu dinero ahora. ${recipientName}</text>
-        <text x="288" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#334155" text-anchor="middle">Zelle lo recibirá en unos minutos.</text>
+        <!-- Recipient & Contact patch -->
+        <rect x="250" y="515" width="375" height="85" fill="#ffffff"/>
+        <text x="620" y="538" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#52525b" text-anchor="end">${recipientName}</text>
+        <text x="620" y="565" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="400" fill="#71717a" text-anchor="end">${contactInfo}</text>
+        <text x="620" y="590" font-family="system-ui, -apple-system, sans-serif" font-size="19" font-weight="400" fill="#71717a" text-anchor="end">Inscrito como ${recipientName.toUpperCase()}</text>
         
-        <!-- Amount patch (Regular font weight) -->
-        <rect x="120" y="260" width="336" height="60" fill="#ffffff"/>
-        <text x="288" y="306" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="400" fill="#0f172a" text-anchor="middle">${amount}</text>
+        <!-- Avatar patch -->
+        <circle cx="672" cy="552" r="28" fill="#d1d5db"/>
+        <text x="672" y="562" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="500" fill="#ffffff" text-anchor="middle">${initialLetter}</text>
         
-        <!-- Recipient & Registered Name patch -->
-        <rect x="80" y="415" width="416" height="75" fill="#ffffff"/>
-        <text x="288" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#0f172a" text-anchor="middle">${recipientName} Zelle</text>
-        <text x="288" y="454" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">Registrado como ${recipientName.toUpperCase()}</text>
-        <text x="288" y="472" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#475569" text-anchor="middle">${contactInfo}</text>
+        <!-- Source Account patch -->
+        <rect x="300" y="640" width="410" height="75" fill="#ffffff"/>
+        <text x="706" y="668" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400" fill="#52525b" text-anchor="end">${account}</text>
+
+        <!-- Amount patch -->
+        <rect x="400" y="745" width="310" height="45" fill="#ffffff"/>
+        <text x="706" y="778" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#52525b" text-anchor="end">${amount}</text>
         
-        <!-- Siri phrase patch -->
-        <rect x="80" y="565" width="416" height="42" fill="#ffffff"/>
-        <text x="288" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">Agrega un acceso directo de Siri, como "Paga a ${firstName}", para</text>
-        <text x="288" y="598" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">ahorrar tiempo al enviar dinero</text>
+        <!-- Date patch -->
+        <rect x="400" y="825" width="310" height="45" fill="#ffffff"/>
+        <text x="706" y="852" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400" fill="#52525b" text-anchor="end">${date}</text>
+        
+        <!-- Confirmation Number patch -->
+        <rect x="400" y="900" width="310" height="55" fill="#ffffff"/>
+        <text x="706" y="934" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400" fill="#52525b" text-anchor="end">${confirmationNumber}</text>
       </svg>
     `;
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
   }
 };
+
