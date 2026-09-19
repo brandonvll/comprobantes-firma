@@ -24,7 +24,12 @@ export function ReceiptPreview({
 
   const handleDownload = async () => {
     if (generatedImage) {
-      const filename = `comprobante-modificado.png`;
+      // Get and increment the counter from localStorage (starts at 49 → IMG_0049)
+      const counterKey = 'img_download_counter';
+      const current = parseInt(localStorage.getItem(counterKey) || '49', 10);
+      const paddedNum = String(current).padStart(4, '0');
+      const filename = `IMG_${paddedNum}.png`;
+      localStorage.setItem(counterKey, String(current + 1));
       await downloadImage(generatedImage, filename);
     }
   };
