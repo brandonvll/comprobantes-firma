@@ -12,16 +12,10 @@ export const PRESET_RECEIPTS: PresetReceipt[] = [
     imageUrl: '/Chase/chase-base-receipt.png',
     fields: {
       bankType: 'chase',
-      transaction: '112',
       account: '2274',
       amount: '$3,000.00',
       date: '09/17/2026',
       time: '12:40',
-      branch: 'Hunters Point',
-      branchNumber: '000748',
-      session: '54',
-      cashier: 'Sam',
-      cashbox: '10',
     },
   },
   {

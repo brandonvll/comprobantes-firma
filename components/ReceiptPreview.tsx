@@ -22,10 +22,10 @@ export function ReceiptPreview({
   const [activeTab, setActiveTab] = useState<'generated' | 'original' | 'split'>('generated');
   const [isZoomed, setIsZoomed] = useState(false);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (generatedImage) {
       const filename = `comprobante-modificado.png`;
-      downloadImage(generatedImage, filename);
+      await downloadImage(generatedImage, filename);
     }
   };
 

@@ -22,16 +22,10 @@ export default function Home() {
   // Form Fields State
   const [fields, setFields] = useState<ReceiptFields>({
     templateId: 'chase',
-    transaction: '112',
     account: '2274',
     amount: '$3,000.00',
     date: '09/17/2026',
     time: '12:40',
-    branch: 'Hunters Point',
-    branchNumber: '000748',
-    session: '54',
-    cashier: 'Sam',
-    cashbox: '10',
   });
 
   // Toasts Notification State

@@ -109,28 +109,50 @@ export function ReceiptForm({
 
       {/* Dynamic Fields Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {activeTemplate.fields.map((field) => (
-          <div key={field.id} className={`space-y-1.5 ${field.id === 'account' || field.id === 'recipientName' ? 'sm:col-span-2' : ''}`}>
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              {getFieldIcon(field.id, themeColor)}
-              <span>{field.label}</span>
-            </label>
-            <input
-              type="text"
-              placeholder={field.placeholder}
-              value={fields[field.id] || ''}
-              onChange={(e) => onChange(field.id, e.target.value)}
-              onBlur={(e) => {
-                if (field.type === 'currency') {
-                  onChange(field.id, formatCurrencyString(e.target.value));
-                }
-              }}
-              disabled={isGenerating}
-              className={`w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 ${borderColor} ${ringColor} text-white placeholder-slate-600 text-sm font-mono transition-all outline-none`}
-              required={field.required !== false}
-            />
-          </div>
-        ))}
+        {activeTemplate.fields.map((field) => {
+          // Map template field types to HTML input types
+          let inputType = 'text';
+          if (field.type === 'date') inputType = 'date';
+          else if (field.type === 'time') inputType = 'time';
+
+          // For date fields, convert display format (MM/DD/YYYY) to input value (YYYY-MM-DD)
+          let inputValue = fields[field.id] || '';
+          if (field.type === 'date' && inputValue && /^\d{2}\/\d{2}\/\d{4}$/.test(inputValue)) {
+            const [mm, dd, yyyy] = inputValue.split('/');
+            inputValue = `${yyyy}-${mm}-${dd}`;
+          }
+
+          return (
+            <div key={field.id} className={`space-y-1.5 ${field.id === 'account' || field.id === 'recipientName' ? 'sm:col-span-2' : ''}`}>
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                {getFieldIcon(field.id, themeColor)}
+                <span>{field.label}</span>
+              </label>
+              <input
+                type={inputType}
+                placeholder={field.placeholder}
+                value={inputValue}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  // Convert HTML date (YYYY-MM-DD) back to display format (MM/DD/YYYY)
+                  if (field.type === 'date' && val && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+                    const [yyyy, mm, dd] = val.split('-');
+                    val = `${mm}/${dd}/${yyyy}`;
+                  }
+                  onChange(field.id, val);
+                }}
+                onBlur={(e) => {
+                  if (field.type === 'currency') {
+                    onChange(field.id, formatCurrencyString(e.target.value));
+                  }
+                }}
+                disabled={isGenerating}
+                className={`w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 ${borderColor} ${ringColor} text-white placeholder-slate-600 text-sm font-mono transition-all outline-none [color-scheme:dark]`}
+                required={field.required !== false}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Submit Button */}
