@@ -25,9 +25,9 @@ export const PRESET_RECEIPTS: PresetReceipt[] = [
     imageUrl: '/Chase/chase-base-receipt-2.jpeg',
     fields: {
       bankType: 'chase2',
-      account: '1647',
-      amount: '$3,000.00',
-      date: '06/24/2026',
+      account: '2274',
+      amount: '$2,900.00',
+      date: '10/20/2026',
       time: '09:53',
     },
   },

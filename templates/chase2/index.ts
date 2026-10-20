@@ -8,9 +8,9 @@ export const chase2Template: ReceiptTemplate = {
     color: 'bg-blue-600',
   },
   fields: [
-    { id: 'account', label: 'Cuenta (últimos 4)', type: 'text', placeholder: 'ej. 1647', defaultValue: '1647' },
-    { id: 'amount', label: 'Monto del depósito', type: 'currency', placeholder: '$0.00', defaultValue: '$3,000.00' },
-    { id: 'date', label: 'Fecha', type: 'date', placeholder: 'MM/DD/YYYY', defaultValue: '06/24/2026' },
+    { id: 'account', label: 'Cuenta (últimos 4)', type: 'text', placeholder: 'ej. 2274', defaultValue: '2274' },
+    { id: 'amount', label: 'Monto del depósito', type: 'currency', placeholder: '$0.00', defaultValue: '$2,900.00' },
+    { id: 'date', label: 'Fecha', type: 'date', placeholder: 'MM/DD/YYYY', defaultValue: '10/20/2026' },
     { id: 'time', label: 'Hora', type: 'time', placeholder: 'HH:MM', defaultValue: '09:53' },
   ],
   buildPrompt: (fields) => `
@@ -30,16 +30,16 @@ MANTÉN EL 100% DE LA FOTOGRAFÍA ORIGINAL DE REFERENCIA SIN ALTERAR EL LOGO BAN
   },
   mapFields: (extractedData: any) => {
     return {
-      account: extractedData.account || '1647',
-      amount: extractedData.amount || '$3,000.00',
-      date: extractedData.date || '06/24/2026',
+      account: extractedData.account || '2274',
+      amount: extractedData.amount || '$2,900.00',
+      date: extractedData.date || '10/20/2026',
       time: extractedData.time || '09:53',
     };
   },
   mockSvg: (baseImageDataUrl, fields) => {
-    const account = fields.account || '1647';
-    const amount = formatCurrencyString(fields.amount || '$3,000.00');
-    const date = fields.date || '06/24/2026';
+    const account = fields.account || '2274';
+    const amount = formatCurrencyString(fields.amount || '$2,900.00');
+    const date = fields.date || '10/20/2026';
     const time = fields.time || '09:53';
     const isDataOrPath = Boolean(baseImageDataUrl && (baseImageDataUrl.startsWith('data:') || baseImageDataUrl.startsWith('/') || baseImageDataUrl.startsWith('http')));
     const bgImage = isDataOrPath ? baseImageDataUrl : '/Chase/chase-base-receipt-2.jpeg';
