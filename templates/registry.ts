@@ -1,4 +1,5 @@
 import { chaseTemplate } from './chase';
+import { chase2Template } from './chase2';
 import { bofaTemplate } from './bofa';
 import { zelleTemplate } from './zelle';
 import { ReceiptTemplate } from '@/types/template';
@@ -6,6 +7,7 @@ import { ReceiptTemplate } from '@/types/template';
 // Registry of all available receipt templates
 export const templates: Record<string, ReceiptTemplate> = {
   chase: chaseTemplate,
+  chase2: chase2Template,
   bofa: bofaTemplate,
   zelle: zelleTemplate,
 };

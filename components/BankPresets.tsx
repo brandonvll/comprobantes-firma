@@ -19,6 +19,19 @@ export const PRESET_RECEIPTS: PresetReceipt[] = [
     },
   },
   {
+    id: 'chase2',
+    name: 'Comprobante Chase 2',
+    bank: 'Chase Bank 2',
+    imageUrl: '/Chase/chase-base-receipt-2.jpeg',
+    fields: {
+      bankType: 'chase2',
+      account: '1647',
+      amount: '$3,000.00',
+      date: '06/24/2026',
+      time: '09:53',
+    },
+  },
+  {
     id: 'bofa',
     name: 'Recibo Bank of America',
     bank: 'Bank of America',
@@ -62,7 +75,7 @@ export function BankPresets({ onSelectPreset }: BankPresetsProps) {
         </h4>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {PRESET_RECEIPTS.map((preset) => (
           <button
             key={preset.id}
